@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@types/nodemailer": "^6.4.9",
     "axios": "^1.4.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
@@ -8,7 +9,11 @@
     "firebase-admin": "^11.8.0",
     "firebase-functions": "^4.3.1",
     "ioredis": "^5.3.2",
-    "nodemon": "^3.0.1"
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.5",
+    "nodemon": "^3.0.1",
+    "@types/bull": "^4.10.0",
+    "bull": "^4.11.3"
   },
   "name": "polly",
   "version": "1.0.0",

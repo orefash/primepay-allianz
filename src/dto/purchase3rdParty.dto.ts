@@ -9,6 +9,7 @@ interface Customer {
     State: string;
     LGA: string;
     Address: string;
+    Bvn?: string;
 }
 
 interface LicenseInfo {
@@ -30,6 +31,10 @@ interface Payment {
     amountPaid: string;
 }
 
+interface ComprehensivePayment extends Payment {
+    PaymentFrequency: string;
+}
+
 interface AgentInfo {
     AgentCode: string;
 }
@@ -37,15 +42,29 @@ interface AgentInfo {
 interface PurchaseDto {
     customer: Customer;
     licenseInfo: LicenseInfo;
-    payment: Payment | null;
-    AgentInfo: AgentInfo;
-}
-
-interface FPurchaseDto {
-    customer: Customer;
-    licenseInfo: LicenseInfo;
     payment: Payment;
     AgentInfo: AgentInfo;
 }
 
-export { PurchaseDto }
+interface ComprehensiveClassic {
+    Premium: string;
+    SumAssured: string;
+}
+
+interface PurchaseComprehensiveDto {
+    customer: Customer;
+    licenseInfo: LicenseInfo;
+    payment: ComprehensivePayment;
+    AgentInfo: AgentInfo;
+    Classic: ComprehensiveClassic;
+}
+
+
+// interface FPurchaseDto {
+//     customer: Customer;
+//     licenseInfo: LicenseInfo;
+//     payment: Payment;
+//     AgentInfo: AgentInfo;
+// }
+
+export { PurchaseDto, PurchaseComprehensiveDto }

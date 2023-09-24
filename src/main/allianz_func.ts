@@ -1,23 +1,21 @@
 import axios, { AxiosInstance } from "axios";
 import { URLSearchParams } from "url";
+import * as FormData from 'form-data';
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
 
-import * as redisConnection from "./redis_helper";
-import { PurchaseDto } from "./dto/purchase3rdParty.dto";
-import { motorSizes, requestQuoteDto } from "./types/appTypes";
+import * as redisConnection from "../helper/redis_helper";
+import { PurchaseComprehensiveDto, PurchaseDto } from "../dto/purchase3rdParty.dto";
+import { FetchData, motorSizes, requestQuoteDto } from "../types/appTypes";
 
 const AllianzBURL = process.env.ALLIANZ_BASE_URL;
 // const accessToken = process.env.ALLIANZ_TEST_TOKEN;
 
-interface FetchData {
-    atoken: string;
-    expires: string;
-}
+
 
 async function getToken(): Promise<FetchData> {
     try {
-        console.log("burl: ", AllianzBURL)
+        // console.log("burl: ", AllianzBURL)
         const instance: AxiosInstance = axios.create({
             baseURL: `${AllianzBURL}`,
         });
@@ -80,7 +78,7 @@ async function fetchToken(): Promise<string | null> {
                 userToken = fTokenObj.atoken;
             }
         } else {
-            console.log("no redis token found: ");
+            // console.log("no redis token found: ");
             const fetchData = await getToken();
             const strObj = JSON.stringify(fetchData);
             redis.set("ftoken", strObj);
@@ -96,6 +94,47 @@ async function fetchToken(): Promise<string | null> {
         redisConnection.close();
     }
 }
+
+
+
+async function uploadFiles(refId: string, docType: string, formData: FormData): Promise<any> {
+    try {
+        const token = await fetchToken();
+
+        if (token == null) {
+            throw new Error("Error getting Token");
+        }
+
+        const instance: AxiosInstance = axios.create({
+            baseURL: `${AllianzBURL}`,
+        });
+
+        const headers = {
+            Authorization: `Bearer ${token}`,
+            ...formData.getHeaders(),
+        };
+
+        // const data = {
+        //     "RegistrationNo": regNo,
+        // };
+
+        const response = await instance.post(`${AllianzBURL}/MotorComprehensive/UploadFiles?ReferenceId=${refId}&DocumentName=${docType}`, formData, { headers });
+        const isValid = response.status === 200;
+
+        return {
+            isValid: isValid,
+            data: response.data
+        };
+    } catch (error) {
+        console.log("Error uploading pic", error);
+        throw error;
+    }
+
+    // return {
+    //     isValid: false,
+    // };
+}
+
 
 async function getAgents(): Promise<any> {
     try {
@@ -159,7 +198,7 @@ async function getMotorSizes(): Promise<any> {
             throw new Error("Error fetching Motor Data");
         }
 
-        console.log("data; ", motorData);
+        // console.log("data; ", motorData);
 
         const newData = motorData.map((item: any) => {
             return `${item.VehicleSizeId}. ${item.Size}`;
@@ -216,14 +255,14 @@ async function getAmountByMotorSizes(sizeId: string): Promise<any> {
             throw new Error("Error fetching Motor Data");
         }
 
-        console.log("data; ", motorData);
+        // console.log("data; ", motorData);
 
         // console.log("Type", typeof(sizeId))
         let sizeIdNo = parseInt(sizeId)
 
         const vehicle: motorSizes | undefined = motorData.find(vehicle => vehicle.VehicleSizeId === sizeIdNo);
-  
-        if(!vehicle){
+
+        if (!vehicle) {
             throw new Error("Invalid Motor Size")
         }
 
@@ -242,7 +281,7 @@ async function getAmountByMotorSizes(sizeId: string): Promise<any> {
         return {
             success: false
         }
-    } 
+    }
 }
 
 async function validateMotor(regNo: string): Promise<any> {
@@ -282,7 +321,7 @@ async function validateMotor(regNo: string): Promise<any> {
 }
 
 
-async function purchase3rdParty(pData: PurchaseDto | null): Promise<any> {
+async function purchase3rdParty(pData: PurchaseDto): Promise<any> {
     try {
         if (pData == null) {
             throw new Error("Error with Purchase Data");
@@ -294,10 +333,10 @@ async function purchase3rdParty(pData: PurchaseDto | null): Promise<any> {
             throw new Error("Error getting Token");
         }
 
-        pData.payment =  {
-            "paymentReference": "R15934356803452",
-            "amountPaid": "5000"
-        }
+        // pData.payment = {
+        //     "paymentReference": "R15934356803452",
+        //     "amountPaid": "5000"
+        // }
         const instance: AxiosInstance = axios.create({
             baseURL: `${AllianzBURL}`,
         });
@@ -317,20 +356,68 @@ async function purchase3rdParty(pData: PurchaseDto | null): Promise<any> {
             data: respData
         };
     } catch (error) {
-        console.log("Error fetching sizes", error);
+        console.log("Error Purchasing Thrid Party", error);
         // throw error;
         return {
             isValid: false
         }
     }
-   
+
+}
+
+
+
+
+async function purchaseComprehensive(pData: PurchaseComprehensiveDto): Promise<any> {
+    try {
+        if (pData == null) {
+            throw new Error("Error with Purchase Data");
+        }
+
+        const token = await fetchToken();
+
+        if (token == null) {
+            throw new Error("Error getting Token");
+        }
+
+        // pData.payment = {
+        //     "paymentReference": "R15934356803452",
+        //     "amountPaid": "5000"
+        // }
+        const instance: AxiosInstance = axios.create({
+            baseURL: `${AllianzBURL}`,
+        });
+
+        const headers = {
+            Authorization: `Bearer ${token}`,
+        };
+
+        const data = pData;
+
+        const response = await instance.post("/MotorComprehensive/Purchase", data, { headers });
+        const isValid = response.status === 200;
+        const respData = response.data;
+
+        return {
+            isValid: isValid,
+            data: respData
+        };
+    } catch (error) {
+        console.log("Error Purchasing COmprehensive", error);
+        // throw error;
+        return {
+            isValid: false
+        }
+    }
+
 }
 
 
 
 async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any> {
-    
+
     try {
+        // console.log("pdata; ", pData)
         if (pData == null) {
             throw new Error("Error with Request Data");
         }
@@ -355,9 +442,26 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
         const isValid = response.status === 200;
         const respData = response.data;
 
+        let classicData = respData["Classic"];
+        console.log("in get quote: ", classicData);
+
+
+        const formattedArray = Object.keys(classicData)
+            .filter(key => classicData[key] !== null)
+            .map((key, index) => {
+                let value = classicData[key];
+                value = value.replace(/ *\([^)]*\) */g, ''); // Remove text inside parentheses
+                return `${index+1}. ${key}: ${'N'+value}`;
+            });
+
+        // console.log("fm: ", formattedArray)
+        // console.log("fm ln: ", formattedArray.length)
+
         return {
             isValid: isValid,
-            data: respData
+            data: JSON.stringify(classicData),
+            message: formattedArray.join('\n'),
+            length: formattedArray.length
         };
     } catch (error) {
         console.log("Error fetching sizes", error);
@@ -366,8 +470,8 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
             isValid: false
         }
     }
-   
+
 }
 
 
-export { getComprehensiveQuote, getAmountByMotorSizes, purchase3rdParty, getToken, getAgents, getMotorSizes, fetchToken, validateMotor };
+export { uploadFiles, getComprehensiveQuote, getAmountByMotorSizes, purchase3rdParty,purchaseComprehensive ,getToken, getAgents, getMotorSizes, fetchToken, validateMotor };
