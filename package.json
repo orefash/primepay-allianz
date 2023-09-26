@@ -3,6 +3,7 @@
     "@types/nodemailer": "^6.4.9",
     "axios": "^1.4.0",
     "body-parser": "^1.20.2",
+    "bull": "^4.11.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
@@ -11,23 +12,22 @@
     "ioredis": "^5.3.2",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.5",
-    "nodemon": "^3.0.1",
-    "@types/bull": "^4.10.0",
-    "bull": "^4.11.3"
+    "nodemon": "^3.0.1"
   },
   "name": "polly",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "./src/index.ts",
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "nodemon index.ts"
+    "start:dev": "nodemon src/index.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/bull": "^4.10.0",
     "typescript": "^5.2.2"
   }
 }

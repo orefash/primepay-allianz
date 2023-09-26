@@ -42,3 +42,14 @@ export interface MultipleFileUploadDto {
     refId: string;
     contactId: string;
 }
+
+export interface State {
+    state: string;
+    alias: string;
+    lgas: string[];
+}
+
+export interface FetchStateResult {
+    success: boolean;
+    state?: string;
+}
