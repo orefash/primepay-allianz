@@ -1,1 +1,35 @@
+# Dependency directories
 node_modules/
+dist/
+build/
+out/
+lib/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Debugging files
+.vscode/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pids
+logs
+results
+*.tsbuildinfo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor specific files
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

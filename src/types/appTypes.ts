@@ -53,3 +53,12 @@ export interface FetchStateResult {
     success: boolean;
     state?: string;
 }
+
+export interface FetchCarResult {
+    success: boolean;
+    item?: string;
+}
+
+export interface CarData {
+    [brand: string]: string[];
+}

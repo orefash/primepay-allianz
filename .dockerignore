@@ -1,0 +1,12 @@
+# Ignore specific files
+node_modules
+*.log
+.DS_Store
+.env
+# Ignore specific directories
+tmp/
+logs/
+
+# Ignore files with a specific pattern
+*.tmp
+*.log

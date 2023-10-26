@@ -1,53 +1,39 @@
-# Building layer
-FROM --platform=linux/amd64 node:16-alpine as development
+# Stage 1: Build the TypeScript Application
+FROM --platform=linux/amd64 node:16-alpine AS build
 
-# Optional NPM automation (auth) token build argument
-# ARG NPM_TOKEN
-
-# Optionally authenticate NPM registry
-# RUN npm set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy configuration files
-COPY tsconfig*.json ./
+# Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Install dependencies from package-lock.json, see https://docs.npmjs.com/cli/v7/commands/npm-ci
-RUN npm ci
+# Install dependencies
+RUN npm install
 
-# Copy application sources (.ts, .tsx, js)
-COPY src/ src/
+# Copy the source code into the container
+COPY . .
 
-# Build application (produces dist/ folder)
+# Build the TypeScript application
 RUN npm run build
 
-# Runtime (production) layer
-FROM --platform=linux/amd64 node:16-alpine as production
+# Stage 2: Create a production-ready image
+FROM --platform=linux/amd64 node:16-alpine
 
-# Optional NPM automation (auth) token build argument
-# ARG NPM_TOKEN
+# Set environment variables (if needed)
+# ENV NODE_ENV=production
 
-# Optionally authenticate NPM registry
-# RUN npm set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-
+# Create a directory for the application
 WORKDIR /app
 
-# Copy dependencies files
+# Copy the built application from the previous stage
+COPY --from=build /app/lib ./lib
 COPY package*.json ./
 
-# Install runtime dependecies (without dev/test dependecies)
-RUN npm ci --omit=dev
+# Install only production dependencies
+RUN npm install --production
 
-# Copy production build
-COPY --from=development /app/dist/ ./dist/
+# Expose the port your application will run on (if needed)
+# EXPOSE 3000
 
-# Copy the templates directory into the production image
-COPY --from=development /app/src/mail/templates/ ./dist/mail/templates/
-
-
-# Expose application port
-EXPOSE 3500
-
-# Start application
-CMD [ "node", "dist/index.js" ]
+# Define the command to start your application
+CMD [ "node", "./lib/index.js" ]

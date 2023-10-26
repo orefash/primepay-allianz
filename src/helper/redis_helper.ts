@@ -4,6 +4,8 @@ dotenvConfig();
 
 let redisInstance: any = null;
 
+
+
 function connect(): any {
     if (!redisInstance) {
         redisInstance = new Redis({
@@ -12,6 +14,7 @@ function connect(): any {
             password: process.env.REDIS_PASSWORD,
         });
     }
+
     return redisInstance;
 }
 
