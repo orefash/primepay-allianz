@@ -115,9 +115,13 @@ export async function purchaseComprehensive(req: Request, res: Response) {
         const pData: PurchaseComprehensiveDto | null = validateComprehensivePurchaseDto(req.body);
         const contactId = req.params.contactId;
 
+        console.log("pol: ", contactId)
+
         if (!pData) {
             return res.status(400).json({ success: false });
         }
+
+        // pData.licenseInfo.Model = pData.licenseInfo.Model.replace()
 
         await triggerCPQ(pData, contactId);
         return res.status(200).json({ success: true });

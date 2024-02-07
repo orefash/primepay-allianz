@@ -6,7 +6,14 @@ import 'winston-mongodb';
 import * as expressWinston from 'express-winston';
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+
+// console.log("Dev mongo uri: ", process.env.MONGO_URI_PROD_LOG)
+
 const mongodbUri: string = ( isProduction ? process.env.MONGO_URI_PROD_LOG : process.env.MONGO_URI_DEV_LOG ) ?? "localhost:27017";
+
+// console.log("Mongo uri: ", mongodbUri)
+
 
 expressWinston.requestWhitelist.push('body');
 expressWinston.responseWhitelist.push('body');

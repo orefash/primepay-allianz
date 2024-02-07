@@ -4,7 +4,7 @@ dotenvConfig();
 
 let redisInstance: any = null;
 
-
+// console.log("Redis: ", process.env.REDIS_HOST)
 
 function connect(): any {
     if (!redisInstance) {

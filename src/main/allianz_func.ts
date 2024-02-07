@@ -10,12 +10,13 @@ import { FetchData, motorSizes, requestQuoteDto } from "../types/appTypes";
 
 const AllianzBURL = process.env.ALLIANZ_BASE_URL;
 // const accessToken = process.env.ALLIANZ_TEST_TOKEN;
+// console.log(`in token - ${process.env.A_UNAME} : ${process.env.A_PASS}`);
 
 
 
 async function getToken(): Promise<FetchData> {
     try {
-        // console.log("burl: ", AllianzBURL)
+        console.log("burl: ", AllianzBURL)
         const instance: AxiosInstance = axios.create({
             baseURL: `${AllianzBURL}`,
         });
@@ -23,7 +24,7 @@ async function getToken(): Promise<FetchData> {
         const params = new URLSearchParams();
 
         if (process.env.A_UNAME && process.env.A_PASS) {
-            console.log(`in token - ${process.env.A_UNAME} : ${process.env.A_PASS}`);
+            // console.log(`in token - ${process.env.A_UNAME} : ${process.env.A_PASS}`);
             params.append("username", process.env.A_UNAME);
             params.append("password", process.env.A_PASS);
             params.append("grant_type", "password");
@@ -50,7 +51,8 @@ async function getToken(): Promise<FetchData> {
 
         throw new Error("Token not found");
     } catch (error) {
-        console.log("Error fetching api token:", error);
+        console.log("Error fetching api token:");
+        // console.log("Error fetching api token:", error);
         throw error;
     }
 }
@@ -59,11 +61,11 @@ async function fetchToken(): Promise<string | null> {
     try {
         let userToken: string | null = null;
         const redis = redisConnection.connect();
-
         const fToken = await redis.get("ftoken");
 
+
         if (fToken) {
-            // console.log("redis token found: ", JSON.parse(fToken));
+            console.log("allianz - redis token found: ", JSON.parse(fToken));
             const fTokenObj = JSON.parse(fToken);
             const expirationDate = new Date(fTokenObj["expires"]);
             const currentDate = new Date();

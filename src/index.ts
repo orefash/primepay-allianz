@@ -13,6 +13,8 @@ import staticsRouter from "./routes/statics.routes";
 import  { appLogger } from "./logger/index";
 dotenvConfig();
 
+
+
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
