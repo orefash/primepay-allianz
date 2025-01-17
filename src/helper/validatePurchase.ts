@@ -29,10 +29,17 @@ export function validatePurchaseDto(body: any): PurchaseDto | null {
     body.licenseInfo.MakeYear &&
     body.payment &&
     body.payment.paymentReference &&
-    body.payment.amountPaid 
+    body.payment.amountPaid
     // body.AgentInfo &&
     // body.AgentInfo.AgentCode
   ) {
+    let carData: string[] = body.licenseInfo.Model.split(" ");
+    if (carData.length > 1) {
+      body.licenseInfo.Model = carData[1];
+    }
+    if(body.AgentInfo && body.AgentInfo.AgentCode && body.AgentInfo.AgentCode == "0"){
+      body.AgentInfo.AgentCode = "Direct";
+    }
     const validatedDto: PurchaseDto = {
       customer: body.customer,
       licenseInfo: body.licenseInfo,
@@ -82,6 +89,10 @@ export function validateComprehensivePurchaseDto(body: any): PurchaseComprehensi
     body.Classic.Premium &&
     body.Classic.SumAssured
   ) {
+    let carData: string[] = body.licenseInfo.Model.split(" ");
+    if (carData.length > 1) {
+      body.licenseInfo.Model = carData[1];
+    }
     const validatedDto: PurchaseComprehensiveDto = {
       customer: body.customer,
       licenseInfo: body.licenseInfo,

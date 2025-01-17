@@ -12,6 +12,14 @@ function connect(): any {
             host: process.env.REDIS_HOST,
             port: parseInt(process.env.REDIS_PORT || '6379'), // Default to port 6379 if not provided
             password: process.env.REDIS_PASSWORD,
+            retryStrategy(times) {
+                // Retry up to 30 times with exponential backoff
+                if (times > 30) {
+                  return null; // End retrying
+                }
+                const delay = Math.min(times * 50, 2000); // Delay between 50ms and 2000ms
+                return delay;
+              },
         });
     }
 

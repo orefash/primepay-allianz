@@ -10,7 +10,7 @@ import paystackRouter from "./routes/paystack.routes";
 import allianzRouter from "./routes/allianz.routes";
 import manychatRouter from "./routes/manychat.routes";
 import staticsRouter from "./routes/statics.routes";
-import  { appLogger } from "./logger/index";
+// import  { appLogger } from "./logger/index";
 dotenvConfig();
 
 
@@ -24,7 +24,7 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use(appLogger);
+// app.use(appLogger);
 
 const serverStatus = () => {
     queueHelper.purchaseThirdPartyQueue.addToQueue({ test: "testing data" })

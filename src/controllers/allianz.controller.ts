@@ -99,8 +99,11 @@ export async function purchaseThirdParty(req: Request, res: Response) {
         const contactId = req.params.contactId;
 
         if (!pData) {
+            console.log("Invalid 3rd purchase dto: ", pData)
             return res.status(400).json({ success: false });
         }
+
+        // console.log("Valid purchase dto: ", pData)
 
         await triggerTPP(pData, contactId);
         return res.status(200).json({ success: true });
@@ -118,11 +121,14 @@ export async function purchaseComprehensive(req: Request, res: Response) {
         console.log("pol: ", contactId)
 
         if (!pData) {
+            console.log("Invalid comp purchase dto: ", pData);
             return res.status(400).json({ success: false });
         }
 
         // pData.licenseInfo.Model = pData.licenseInfo.Model.replace()
 
+
+        console.log("Valid comp purchase dto: ", pData);
         await triggerCPQ(pData, contactId);
         return res.status(200).json({ success: true });
     } catch (error) {

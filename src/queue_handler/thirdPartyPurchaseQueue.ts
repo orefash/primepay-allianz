@@ -10,25 +10,33 @@ const tppQueue = new Queue("tpp", opts);
 
 tppQueue.process(async (job) => {
 
-    let params: PurchaseDto = job.data.params;
-    console.log("In PPQ");
-    let pData = await purchase3rdParty(params);
+    try {
 
-    console.log("Res: ", pData);
-    if(pData.isValid){
-        let responseData = await setPolicyFields(job.data.contactId, pData.data.referenceId, pData.data.certificateNumber);
+        console.log("In PPQ: ");
+        let params: PurchaseDto = job.data.params;
+        console.log("In PPQ: ");
+        let pData = await purchase3rdParty(params);
 
-        console.log("tpp policy: ", responseData);
+        console.log("Res: ", pData);
+        if (pData.isValid) {
+            let responseData = await setPolicyFields(job.data.contactId, pData.data.referenceId, pData.data.certificateNumber);
 
-        if(responseData){
-            let sendFlowResp = await sendFlow(job.data.contactId, "policy_confirm");
-            console.log("tpp send flow: ", sendFlowResp);
+            console.log("tpp policy: ", responseData);
+
+            if (responseData) {
+                let sendFlowResp = await sendFlow(job.data.contactId, "policy_confirm");
+                console.log("tpp send flow: ", sendFlowResp);
+            }
         }
+
+    } catch (error) {
+
+        console.log("TPP Queue error: ", error)
     }
-    
+
 
 })
 
-export async function triggerTPP(params: PurchaseDto, contactId: string ) {
+export async function triggerTPP(params: PurchaseDto, contactId: string) {
     tppQueue.add({ params, contactId });
 }
