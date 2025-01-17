@@ -1,5 +1,5 @@
 import * as  express from 'express';
-import { getComprehensiveQuote, getMotorPremiumBySize, getMotorSizes, purchaseComprehensive, purchaseThirdParty, uploadMultipleDocs, validateMotor, validateQuote } from '../controllers/allianz.controller';
+import { getComprehensiveQuote, getMotorPremiumBySize, getMotorSizes, purchaseComprehensive, purchaseThirdParty, uploadMultipleDocs, validateMotor, validateQuote, generatePolicyCertificate } from '../controllers/allianz.controller';
 
 const allianzRouter = express.Router();
 
@@ -12,5 +12,6 @@ allianzRouter.post('/purchase-comprehensive/user/:contactId', purchaseComprehens
 allianzRouter.post('/get-comprehensive-quote', getComprehensiveQuote);
 allianzRouter.post('/validate-quote', validateQuote);
 allianzRouter.post('/upload-multiple-docs/user/:contactId', uploadMultipleDocs);
+allianzRouter.post('/generate-certificate/user/:contactId', generatePolicyCertificate);
 
 export default allianzRouter;

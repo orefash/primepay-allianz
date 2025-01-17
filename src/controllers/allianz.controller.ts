@@ -7,11 +7,11 @@ import { validateComprehensivePurchaseDto, validatePurchaseDto } from '../helper
 // import * as queueHelper from "../queue_handler/queue";
 
 import { triggerUploadImages } from "../queue_handler/uploadFilesQueue";
-import { triggerTPP, } from "../queue_handler/thirdPartyPurchaseQueue";
+import {  purchaseRun } from "../queue_handler/thirdPartyPurchaseQueue";
 import { triggerCPQ } from "../queue_handler/comprehensivePurchaseQueue";
-import { ValidateQuoteDto, requestQuoteDto } from '../types/appTypes';
-import { validateFilesUploadDto, validateMotorQuoteBody, validateQuoteChoice } from '../helper/dtoValidator';
-
+import { GeneratePolicyCertificateDto, ValidateQuoteDto, requestQuoteDto } from '../types/appTypes';
+import { validateFilesUploadDto, validateMotorQuoteBody, validatePolicyCertificateDto, validateQuoteChoice } from '../helper/dtoValidator';
+import  { logger } from "../logger/index";
 // fileUploadController.js
 
 
@@ -103,9 +103,13 @@ export async function purchaseThirdParty(req: Request, res: Response) {
             return res.status(400).json({ success: false });
         }
 
-        // console.log("Valid purchase dto: ", pData)
+        logger.info("in ptp");
+        console.log("Valid purchase dto: ", pData)
 
-        await triggerTPP(pData, contactId);
+        await purchaseRun(pData, contactId);
+
+
+        // await triggerTPP(pData, contactId);
         return res.status(200).json({ success: true });
     } catch (error) {
         console.error('Error in purchaseThirdParty:', error);
@@ -167,6 +171,24 @@ export async function validateQuote(req: Request, res: Response) {
         return res.status(200).json({ success: data.success, rstatus: data.success ? 1 : 0, ...data });
     } catch (error) {
         console.error('Error in validateQuote:', error);
+        return res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+}
+
+
+
+export async function generatePolicyCertificate(req: Request, res: Response) {
+    try {
+        const pData: GeneratePolicyCertificateDto | null = validatePolicyCertificateDto(req.body);
+
+        if (!pData) {
+            return res.status(400).json({ success: false, rstatus: 0 });
+        }
+
+        const data = await allianzFunc.generatePolicyCertificate(pData);
+        return res.status(200).json({ success: data.success, rstatus: data.success ? 1 : 0, ...data });
+    } catch (error) {
+        logger.error('Error in generate policy certificate:', error);
         return res.status(500).json({ success: false, error: 'Internal server error' });
     }
 }

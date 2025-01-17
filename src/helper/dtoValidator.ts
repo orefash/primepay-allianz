@@ -1,4 +1,4 @@
-import { FileUploadDto, MultipleFileUploadDto, ValidateQuoteDto, requestQuoteDto } from "../types/appTypes";
+import { FileUploadDto, GeneratePolicyCertificateDto, MultipleFileUploadDto, ValidateQuoteDto, requestQuoteDto } from "../types/appTypes";
 
 
 export function validateMotorQuoteBody(body: any): requestQuoteDto | null {
@@ -27,6 +27,19 @@ export function validateQuoteChoice(body: any): ValidateQuoteDto | null {
         const validateDto: ValidateQuoteDto = {
             tempString: body.tempString,
             qouteChoice: body.qouteChoice
+        }
+
+        return validateDto;
+    }
+    return null;
+}
+
+export function validatePolicyCertificateDto(body: any): GeneratePolicyCertificateDto | null {
+    if (
+        body.policyno 
+    ) {
+        const validateDto: GeneratePolicyCertificateDto = {
+            policyno: body.policyno
         }
 
         return validateDto;

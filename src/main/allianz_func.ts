@@ -3,10 +3,11 @@ import { URLSearchParams } from "url";
 import * as FormData from 'form-data';
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
+import { logger } from "../logger/index";
 
 import * as redisConnection from "../helper/redis_helper";
 import { PurchaseComprehensiveDto, PurchaseDto } from "../dto/purchase3rdParty.dto";
-import { FetchData, motorSizes, requestQuoteDto } from "../types/appTypes";
+import { FetchData, GeneratePolicyCertificateDto, motorSizes, requestQuoteDto } from "../types/appTypes";
 
 const AllianzBURL = process.env.ALLIANZ_BASE_URL;
 // const accessToken = process.env.ALLIANZ_TEST_TOKEN;
@@ -51,7 +52,7 @@ async function getToken(): Promise<FetchData> {
 
         throw new Error("Token not found");
     } catch (error) {
-        console.log("Error fetching api token:");
+        logger.error("Error fetching api token:");
         // console.log("Error fetching api token:", error);
         throw error;
     }
@@ -65,7 +66,7 @@ async function fetchToken(): Promise<string | null> {
 
 
         if (fToken) {
-            console.log("allianz - redis token found: ", JSON.parse(fToken));
+            // console.log("allianz - redis token found: ", JSON.parse(fToken));
             const fTokenObj = JSON.parse(fToken);
             const expirationDate = new Date(fTokenObj["expires"]);
             const currentDate = new Date();
@@ -90,7 +91,7 @@ async function fetchToken(): Promise<string | null> {
         redisConnection.close();
         return userToken;
     } catch (error) {
-        console.log("Error fetching token:", error);
+        logger.error("Error fetching token:", error);
         throw error;
     } finally {
         redisConnection.close();
@@ -128,7 +129,7 @@ async function uploadFiles(refId: string, docType: string, formData: FormData): 
             data: response.data
         };
     } catch (error) {
-        console.log("Error uploading pic", error);
+        logger.error("Error uploading pic", error);
         throw error;
     }
 
@@ -157,7 +158,7 @@ async function getAgents(): Promise<any> {
         const response = await instance.get("/Motor/agents", { headers });
         return response.data;
     } catch (error) {
-        console.log("Error fetching agents", error);
+        logger.error("Error fetching agents", error);
         throw error;
     }
 }
@@ -369,6 +370,52 @@ async function purchase3rdParty(pData: PurchaseDto): Promise<any> {
 
 
 
+async function generatePolicyCertificate(pData: GeneratePolicyCertificateDto): Promise<any> {
+    try {
+        if (pData == null) {
+            throw new Error("Error with Policy certificate Dto");
+        }
+
+        const token = await fetchToken();
+
+        if (token == null) {
+            throw new Error("Error getting Token");
+        }
+
+        // pData.payment = {
+        //     "paymentReference": "R15934356803452",
+        //     "amountPaid": "5000"
+        // }
+        const instance: AxiosInstance = axios.create({
+            baseURL: `${AllianzBURL}`,
+        });
+
+        const headers = {
+            Authorization: `Bearer ${token}`,
+        };
+
+        const data = pData;
+
+        const response = await instance.post("/Motor/GenerateTPLCertificate", data, { headers });
+        const isValid = response.status === 200;
+        const respData = response.data;
+
+        return {
+            isValid: isValid,
+            data: respData
+        };
+    } catch (error) {
+        logger.error("Error generating policy certificate", error);
+        // throw error;
+        return {
+            isValid: false
+        }
+    }
+
+}
+
+
+
 
 async function purchaseComprehensive(pData: PurchaseComprehensiveDto): Promise<any> {
     try {
@@ -476,4 +523,4 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
 }
 
 
-export { uploadFiles, getComprehensiveQuote, getAmountByMotorSizes, purchase3rdParty,purchaseComprehensive ,getToken, getAgents, getMotorSizes, fetchToken, validateMotor };
+export { uploadFiles, getComprehensiveQuote, getAmountByMotorSizes, purchase3rdParty,purchaseComprehensive ,getToken, getAgents, getMotorSizes, fetchToken, validateMotor, generatePolicyCertificate };

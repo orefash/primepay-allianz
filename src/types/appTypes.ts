@@ -23,6 +23,11 @@ export interface ValidateQuoteDto {
 }
 
 
+export interface GeneratePolicyCertificateDto {
+    policyno: string,
+}
+
+
 export interface FileUploadDto {
     imageUrl: string;
     refId: string;
