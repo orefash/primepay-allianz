@@ -6,28 +6,45 @@ import { PurchaseComprehensiveDto, PurchaseDto } from '../dto/purchase3rdParty.d
 import { validateComprehensivePurchaseDto, validatePurchaseDto } from '../helper/validatePurchase';
 // import * as queueHelper from "../queue_handler/queue";
 
-import { triggerUploadImages } from "../queue_handler/uploadFilesQueue";
-import {  purchaseRun } from "../queue_handler/thirdPartyPurchaseQueue";
-import { triggerCPQ } from "../queue_handler/comprehensivePurchaseQueue";
-import { GeneratePolicyCertificateDto, ValidateQuoteDto, requestQuoteDto } from '../types/appTypes';
+import { uploadDocsRun } from "../queue_handler/uploadFilesQueue";
+import { purchaseRun } from "../queue_handler/thirdPartyPurchaseQueue";
+import { purchaseComprehensiveRun } from "../queue_handler/comprehensivePurchaseQueue";
+import { GeneratePolicyCertificateDto, MultipleFileUploadDto, ValidateQuoteDto, requestQuoteDto } from '../types/appTypes';
 import { validateFilesUploadDto, validateMotorQuoteBody, validatePolicyCertificateDto, validateQuoteChoice } from '../helper/dtoValidator';
-import  { logger } from "../logger/index";
+import { logger } from "../logger/index";
 // fileUploadController.js
 
 
 export const uploadMultipleDocs = async (req: Request, res: Response) => {
     const contactId = req.params.contactId;
 
-    const pData = validateFilesUploadDto({ ...req.body, contactId });
+    try {
+        const pData: MultipleFileUploadDto | null = validateFilesUploadDto({ ...req.body, contactId });
 
-    if (!pData) {
-        return res.status(400).json({ success: false });
+        if (!pData) {
+            return res.status(400).json({ success: false, message: "Invalid input data" }); // More informative message
+        }
+
+        // await triggerUploadImages(pData);
+
+        await uploadDocsRun(pData, contactId);
+
+        return res.status(200).json({ success: true, message: "Files uploaded successfully" }); // Success message
+
+    } catch (error) {
+        console.error("Error uploading files:", error); // Log the error for debugging
+
+        if (error instanceof Error && error.name === 'CustomError') { // Check if it's a custom error
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        if (error instanceof Error && error.name === 'ValidationError') { // Check if it's a validation error
+            return res.status(400).json({ success: false, message: error.message });
+        }
+
+        return res.status(500).json({ success: false, message: "An error occurred during file upload." }); // Generic error message
     }
-
-    await triggerUploadImages(pData);
-
-    return res.status(200).json({ success: true });
 };
+
 
 
 
@@ -133,7 +150,7 @@ export async function purchaseComprehensive(req: Request, res: Response) {
 
 
         console.log("Valid comp purchase dto: ", pData);
-        await triggerCPQ(pData, contactId);
+        await purchaseComprehensiveRun(pData, contactId);
         return res.status(200).json({ success: true });
     } catch (error) {
         console.error('Error in purchaseComprehensive:', error);

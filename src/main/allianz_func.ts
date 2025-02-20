@@ -452,7 +452,7 @@ async function purchaseComprehensive(pData: PurchaseComprehensiveDto): Promise<a
             data: respData
         };
     } catch (error) {
-        console.log("Error Purchasing COmprehensive", error);
+        logger.error("Error Purchasing COmprehensive", error);
         // throw error;
         return {
             isValid: false
@@ -489,10 +489,13 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
 
         const response = await instance.post("/MotorComprehensive/quote", data, { headers });
         const isValid = response.status === 200;
+
+        if (!isValid) 
+            throw new Error("Error getting Quotes");
         const respData = response.data;
 
         let classicData = respData["Classic"];
-        console.log("in get quote: ", classicData);
+        logger.info("in get quote: ", classicData);
 
 
         const formattedArray = Object.keys(classicData)
@@ -513,7 +516,7 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
             length: formattedArray.length
         };
     } catch (error) {
-        console.log("Error fetching sizes", error);
+        logger.error("Error getting comprehensive quote", error);
         // throw error;
         return {
             isValid: false
@@ -524,3 +527,4 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
 
 
 export { uploadFiles, getComprehensiveQuote, getAmountByMotorSizes, purchase3rdParty,purchaseComprehensive ,getToken, getAgents, getMotorSizes, fetchToken, validateMotor, generatePolicyCertificate };
+
