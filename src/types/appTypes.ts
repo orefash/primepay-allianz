@@ -7,7 +7,8 @@ export interface FetchData {
 export interface motorSizes {
     VehicleSizeId: number,
     Size: string,
-    Premium: number
+    Premium: number,
+    oldPremium: number
 }
 
 export interface requestQuoteDto {

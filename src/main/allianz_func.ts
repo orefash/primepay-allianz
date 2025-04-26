@@ -269,6 +269,18 @@ async function getAmountByMotorSizes(sizeId: string): Promise<any> {
             throw new Error("Invalid Motor Size")
         }
 
+        if (vehicle) {
+            vehicle.oldPremium = vehicle.Premium;
+
+            let fee = vehicle.Premium * 1.5 / 100;
+            if (fee < 500)
+                vehicle.Premium = vehicle.Premium + 500
+            else
+                vehicle.Premium = vehicle.Premium + 2000
+        }
+
+
+
         // const newData = motorData.map((item: any) => {
         //     return `${item.VehicleSizeId}. ${item.Size}`;
         // }).join('\n');

@@ -10,6 +10,7 @@ import paystackRouter from "./routes/paystack.routes";
 import allianzRouter from "./routes/allianz.routes";
 import manychatRouter from "./routes/manychat.routes";
 import staticsRouter from "./routes/statics.routes";
+import validatorRouter from "./routes/validator.routes";
 
 dotenvConfig();
 
@@ -129,6 +130,7 @@ app.use('/', paystackRouter);
 app.use('/', allianzRouter);
 app.use('/', manychatRouter);
 app.use('/', staticsRouter);
+app.use('/', validatorRouter);
 
 
 const PORT = process.env.PORT || 3900;
