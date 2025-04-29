@@ -117,20 +117,20 @@ export async function purchaseThirdParty(req: Request, res: Response) {
 
         if (!pData) {
             console.log("Invalid 3rd purchase dto: ", pData)
-            return res.status(400).json({ success: false });
+            return res.status(400).json({ success: false, fstatus: 4 });
         }
 
         logger.info("in ptp");
         console.log("Valid purchase dto: ", pData)
 
-        await purchaseRun(pData, contactId);
+        let runResult = await purchaseRun(pData, contactId);
 
 
         // await triggerTPP(pData, contactId);
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ success: true, ...runResult });
     } catch (error) {
         console.error('Error in purchaseThirdParty:', error);
-        return res.status(500).json({ success: false, error: 'Internal server error' });
+        return res.status(500).json({ success: false, error: 'Internal server error', fstatus: 4 });
     }
 }
 
@@ -150,6 +150,8 @@ export async function purchaseComprehensive(req: Request, res: Response) {
 
 
         console.log("Valid comp purchase dto: ", pData);
+
+
         await purchaseComprehensiveRun(pData, contactId);
         return res.status(200).json({ success: true });
     } catch (error) {

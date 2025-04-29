@@ -9,7 +9,13 @@ import { logger } from "../logger/index";
 
 const tppQueue = new Queue("tpp", opts);
 
-export async function purchaseRun (params: PurchaseDto, contactId: string){
+export async function 
+
+
+
+
+
+purchaseRun (params: PurchaseDto, contactId: string){
 
     let pData = await purchase3rdParty(params);
 
@@ -24,12 +30,35 @@ export async function purchaseRun (params: PurchaseDto, contactId: string){
         if (responseData) {
             let sendFlowResp = await sendFlow(contactId, "policy_confirm");
             console.log("tpp send flow: ", sendFlowResp);
+            if(sendFlowResp) {
+                return {
+                    fstatus: 0,
+                    message: "insurance purchased successfully"
+                }
+            }
+
+            return {
+                fstatus: 3,
+                message: "error sending to policy confirm"
+            }
+            
+        } else {
+            return {
+                fstatus: 2,
+                message: "error setting policy fields"
+            }
         }
+
+        
     } else {
         logger.error("pdata is invalid");
+
+        return {
+            fstatus: 1,
+            message: pData.message
+        }
     }
 
-    logger.info("End of purchase run");
 }
 
 tppQueue.process(async (job) => {

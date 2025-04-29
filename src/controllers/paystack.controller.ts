@@ -13,6 +13,7 @@ export const createPaymentLinkController = async (req: Request, res: Response) =
         console.error('Error in createPaymentLinkController:', error);
         res.status(500).json({
             success: false,
+            fstatus: 0,
             message: 'Internal server error',
         });
     }
@@ -32,6 +33,7 @@ export const verifyPaymentController = async (req: Request, res: Response) => {
         console.error('Error in verifyPaymentController:', error);
         res.status(500).json({
             success: false,
+            fstatus: 0,
             message: 'Internal server error',
         });
     }

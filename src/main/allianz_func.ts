@@ -370,11 +370,12 @@ async function purchase3rdParty(pData: PurchaseDto): Promise<any> {
             isValid: isValid,
             data: respData
         };
-    } catch (error) {
-        console.log("Error Purchasing Thrid Party", error);
+    } catch (error: any) {
+        console.log("Error Purchasing Thrid Party", error.message);
         // throw error;
         return {
-            isValid: false
+            isValid: false,
+            message: error.message
         }
     }
 
