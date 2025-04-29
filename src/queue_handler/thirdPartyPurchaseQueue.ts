@@ -25,8 +25,6 @@ purchaseRun (params: PurchaseDto, contactId: string){
 
         console.log("tpp policy: ", responseData);
 
-        logger.info("testing the service");
-
         if (responseData) {
             let sendFlowResp = await sendFlow(contactId, "policy_confirm");
             console.log("tpp send flow: ", sendFlowResp);
@@ -51,7 +49,7 @@ purchaseRun (params: PurchaseDto, contactId: string){
 
         
     } else {
-        logger.error("pdata is invalid");
+        logger.error("purchase third party api error");
 
         return {
             fstatus: 1,

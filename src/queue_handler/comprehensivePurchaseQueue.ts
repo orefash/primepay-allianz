@@ -24,12 +24,34 @@ export async function purchaseComprehensiveRun(params: PurchaseComprehensiveDto,
         if (responseData) {
             let sendFlowResp = await sendFlow(contactId, "policy_confirm");
             logger.info("cpq send flow: ", sendFlowResp);
+            
+            if(sendFlowResp) {
+                return {
+                    fstatus: 0,
+                    message: "insurance purchased successfully"
+                }
+            }
+
+            return {
+                fstatus: 3,
+                message: "error sending to policy confirm"
+            }
+            
+        } else {
+            return {
+                fstatus: 2,
+                message: "error setting policy fields"
+            }
         }
     }else{
-        throw new Error("Comprehensive Purchase Error, invalid pData")
-    }
+        logger.error("purchase comprehensive api error");
 
-    logger.info("End of purchase run");
+        return {
+            fstatus: 1,
+            message: pData.message
+        }
+
+    }
 
 }
 

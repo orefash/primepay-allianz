@@ -38,6 +38,8 @@ export async function createPaymentLink(reqData: CreatePaymentLinkRequest): Prom
 
         const body = reqData;
 
+        console.log("gen pay link data: ", body)
+
         const response = await instance.post("/", body, { headers });
 
         if(response.status != 200)

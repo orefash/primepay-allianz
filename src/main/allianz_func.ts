@@ -61,34 +61,40 @@ async function getToken(): Promise<FetchData> {
 async function fetchToken(): Promise<string | null> {
     try {
         let userToken: string | null = null;
-        const redis = redisConnection.connect();
-        const fToken = await redis.get("ftoken");
+        // const redis = redisConnection.connect();
+        // const fToken = await redis.get("ftoken");
+        // const fToken = false;
 
 
-        if (fToken) {
-            // console.log("allianz - redis token found: ", JSON.parse(fToken));
-            const fTokenObj = JSON.parse(fToken);
-            const expirationDate = new Date(fTokenObj["expires"]);
-            const currentDate = new Date();
+        // if (fToken) {
+        //     // console.log("allianz - redis token found: ", JSON.parse(fToken));
+        //     const fTokenObj = JSON.parse(fToken);
+        //     const expirationDate = new Date(fTokenObj["expires"]);
+        //     const currentDate = new Date();
 
-            if (expirationDate < currentDate) {
-                console.log("redis token expired: ");
-                const fetchData = await getToken();
-                const strObj = JSON.stringify(fetchData);
-                redis.set("ftoken", strObj);
-                userToken = fetchData.atoken;
-            } else {
-                userToken = fTokenObj.atoken;
-            }
-        } else {
-            // console.log("no redis token found: ");
-            const fetchData = await getToken();
-            const strObj = JSON.stringify(fetchData);
-            redis.set("ftoken", strObj);
+        //     if (expirationDate < currentDate) {
+        //         console.log("redis token expired: ");
+        //         const fetchData = await getToken();
+        //         const strObj = JSON.stringify(fetchData);
+        //         redis.set("ftoken", strObj);
+        //         userToken = fetchData.atoken;
+        //     } else {
+        //         userToken = fTokenObj.atoken;
+        //     }
+        // } else {
+        //     // console.log("no redis token found: ");
+        //     const fetchData = await getToken();
+        //     const strObj = JSON.stringify(fetchData);
+        //     redis.set("ftoken", strObj);
+        //     userToken = fetchData.atoken;
+        // }
+
+        const fetchData = await getToken();
+            // const strObj = JSON.stringify(fetchData);
+            // redis.set("ftoken", strObj);
             userToken = fetchData.atoken;
-        }
 
-        redisConnection.close();
+        // redisConnection.close();
         return userToken;
     } catch (error) {
         logger.error("Error fetching token:", error);
@@ -464,11 +470,12 @@ async function purchaseComprehensive(pData: PurchaseComprehensiveDto): Promise<a
             isValid: isValid,
             data: respData
         };
-    } catch (error) {
+    } catch (error: any) {
         logger.error("Error Purchasing COmprehensive", error);
         // throw error;
         return {
-            isValid: false
+            isValid: false,
+            message: error.message
         }
     }
 

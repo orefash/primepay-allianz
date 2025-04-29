@@ -143,20 +143,17 @@ export async function purchaseComprehensive(req: Request, res: Response) {
 
         if (!pData) {
             console.log("Invalid comp purchase dto: ", pData);
-            return res.status(400).json({ success: false });
+            return res.status(400).json({ success: false, fstatus: 4 });
         }
-
-        // pData.licenseInfo.Model = pData.licenseInfo.Model.replace()
-
 
         console.log("Valid comp purchase dto: ", pData);
 
+        let runResult = await purchaseComprehensiveRun(pData, contactId);
 
-        await purchaseComprehensiveRun(pData, contactId);
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ success: true, ...runResult });
     } catch (error) {
         console.error('Error in purchaseComprehensive:', error);
-        return res.status(500).json({ success: false, error: 'Internal server error' });
+        return res.status(500).json({ success: false, error: 'Internal server error', fstatus: 4 });
     }
 }
 
