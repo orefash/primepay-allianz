@@ -1,4 +1,4 @@
-import { PurchaseComprehensiveDto, PurchaseDto } from '../dto/purchase3rdParty.dto'; // Import your DTO structure here
+import { PurchaseComprehensiveDto, PurchaseDto } from '../dto/allianz.dto'; // Import your DTO structure here
 
 export function validatePurchaseDto(body: any): PurchaseDto | null {
   // Your custom validation logic here

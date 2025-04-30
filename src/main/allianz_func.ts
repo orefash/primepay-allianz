@@ -6,7 +6,7 @@ dotenvConfig();
 import { logger } from "../logger/index";
 
 import * as redisConnection from "../helper/redis_helper";
-import { PurchaseComprehensiveDto, PurchaseDto } from "../dto/purchase3rdParty.dto";
+import { PurchaseComprehensiveDto, PurchaseDto } from "../dto/allianz.dto";
 import { FetchData, GeneratePolicyCertificateDto, motorSizes, requestQuoteDto } from "../types/appTypes";
 
 const AllianzBURL = process.env.ALLIANZ_BASE_URL;

@@ -3,7 +3,7 @@ import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
 import opts from "./redisConnection";
 import { purchase3rdParty } from "../main/allianz_func";
-import { PurchaseDto } from "../dto/purchase3rdParty.dto";
+import { PurchaseDto } from "../dto/allianz.dto";
 import { setPolicyFields, sendFlow } from "../helper/manychatHelper";
 import { logger } from "../logger/index";
 

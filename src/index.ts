@@ -11,6 +11,7 @@ import allianzRouter from "./routes/allianz.routes";
 import manychatRouter from "./routes/manychat.routes";
 import staticsRouter from "./routes/statics.routes";
 import validatorRouter from "./routes/validator.routes";
+import pavisRouter from "./routes/pavis.routes";
 
 dotenvConfig();
 
@@ -131,6 +132,7 @@ app.use('/', allianzRouter);
 app.use('/', manychatRouter);
 app.use('/', staticsRouter);
 app.use('/', validatorRouter);
+app.use('/', pavisRouter);
 
 
 const PORT = process.env.PORT || 3900;

@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import * as allianzFunc from '../main/allianz_func';
 import * as allianzHelper from "../main/allianz_helper";
-import { PurchaseComprehensiveDto, PurchaseDto } from '../dto/purchase3rdParty.dto';
+import { PurchaseComprehensiveDto, PurchaseDto } from '../dto/allianz.dto';
 import { validateComprehensivePurchaseDto, validatePurchaseDto } from '../helper/validatePurchase';
 // import * as queueHelper from "../queue_handler/queue";
 
