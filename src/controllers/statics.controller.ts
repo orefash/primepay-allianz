@@ -74,15 +74,10 @@ export const getCarString = async (req: Request, res: Response) => {
         if(!req.params.page || !req.params.type)
             throw new Error("Invalid Page Or Type");
 
-        
-
         const page: number = parseInt(req.params.page);
         const reqType: number = parseInt(req.params.type);
         const carType: string | undefined = req.query?.carType as string | undefined;
 
-
-        // console.log("Page parse: ", page);
-        // console.log("Page parse check : ", isNaN(page));
         if(isNaN(page) || isNaN(reqType))
             throw new Error("Invalid Page");
 
@@ -104,6 +99,21 @@ export const getCarString = async (req: Request, res: Response) => {
 
 };
 
+async function removeFirstOccurrence(mainString: string | undefined, substringToRemove: string): Promise<string | undefined> {
+
+    if(!mainString)
+        return mainString
+    const index = mainString.indexOf(substringToRemove);
+  
+    if (index === -1) {
+      // Substring not found, return the original string
+      return mainString;
+    } else {
+      // Substring found, create a new string by excluding it
+      return mainString.slice(0, index) + mainString.slice(index + substringToRemove.length);
+    }
+  }
+
 
 export const fetchCarData = async (req: Request, res: Response) => {
     try {
@@ -114,6 +124,11 @@ export const fetchCarData = async (req: Request, res: Response) => {
 
         const carData: FetchCarResult = getCarByPageAndItem(page, item, reqType, carType);
 
+        if(reqType != 1 && carType){
+            carData.item = (await removeFirstOccurrence(carData.item, carType))?.trim();
+        }
+ 
+        
         res.status(200).json({
             item: carData.item,
             rstatus: carData.success ? 1 : 0
