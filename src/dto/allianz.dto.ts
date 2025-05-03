@@ -67,4 +67,4 @@ interface PurchaseComprehensiveDto {
 //     AgentInfo: AgentInfo;
 // }
 
-export { PurchaseDto, PurchaseComprehensiveDto }
+export { PurchaseDto, PurchaseComprehensiveDto, Customer, LicenseInfo }

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { generateApplicationReference } from '../helper/utils';
+// import { generateApplicationReference } from '../helper/utils';
 import { CompleteApplication, InitApplication, isValidInitApplication } from '../dto/pavis.dto';
+import { generateUniqueApplicationReference, saveInitApplicationData } from '../db/application';
 
 
 export const saveApplication = async (req: Request, res: Response) => {
@@ -14,13 +15,16 @@ export const saveApplication = async (req: Request, res: Response) => {
 
         const applicationData = req.body as InitApplication;
 
-        let appln_id = await generateApplicationReference()
+        let appln_id = await generateUniqueApplicationReference()
 
         let finalData: CompleteApplication = { ...applicationData, appln_id }
 
         console.log("Full Data: ", finalData);
 
-        return res.status(200).json({ success: true, data: finalData, message: 'Data saved successfully', fstatus: 1 });
+        let isSaved: boolean = await saveInitApplicationData(finalData);
+
+
+        return res.status(200).json({ success: true, data: finalData, message: 'Data saved successfully', fstatus: 1, saved: isSaved });
 
     } catch (error: any) {
         return res.status(400).json({ success: false, message: 'Error in InitApplication. ' + error.message, fstatus: 0 });

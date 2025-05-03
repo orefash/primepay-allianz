@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { URLSearchParams } from "url";
 import * as FormData from 'form-data';
 import { config as dotenvConfig } from "dotenv";
@@ -90,9 +90,9 @@ async function fetchToken(): Promise<string | null> {
         // }
 
         const fetchData = await getToken();
-            // const strObj = JSON.stringify(fetchData);
-            // redis.set("ftoken", strObj);
-            userToken = fetchData.atoken;
+        // const strObj = JSON.stringify(fetchData);
+        // redis.set("ftoken", strObj);
+        userToken = fetchData.atoken;
 
         // redisConnection.close();
         return userToken;
@@ -366,11 +366,51 @@ async function purchase3rdParty(pData: PurchaseDto): Promise<any> {
             Authorization: `Bearer ${token}`,
         };
 
-        const data = pData;
+        let data: PurchaseDto = pData;
 
-        const response = await instance.post("/Motor/PurchaseMotorThirdParty", data, { headers });
+        // const response = await instance.post("/Motor/PurchaseMotorThirdParty", data, { headers });
+
+
+        let response: AxiosResponse<any>;
+        try {
+            response = await instance.post("/Motor/PurchaseMotorThirdParty", data, { headers });
+
+            console.log("Response: ", response)
+
+        } catch (error: any) {
+            console.log("Error Response Status: ", error.response.status)
+            console.log("Error Response Data: ", error.response.data)
+
+            if (error.response?.status === 400 && error.response.data?.Message === 'Agent does not exist') {
+                console.log("Agent does not exist. Retrying with AgentCode = 'Direct'");
+
+                logger.info("Agent does not exist. Retrying with AgentCode = 'Direct'");
+                // Modify the AgentCode and retry
+                data = {
+                    ...pData,
+                    AgentInfo: {
+                        AgentCode: "Direct",
+                    },
+                };
+
+
+                logger.info("Purchase Data: ", data);
+                response = await instance.post("/Motor/PurchaseMotorThirdParty", data, { headers }); // Retry the request
+            } else {
+                // It's a different error, re-throw it
+                console.log("Error Purchasing Third Party (other than agent error)", error.message);
+                return {
+                    isValid: false,
+                    message: error.message,
+                };
+            }
+        }
+
+
+
         const isValid = response.status === 200;
         const respData = response.data;
+
 
         return {
             isValid: isValid,
@@ -460,9 +500,47 @@ async function purchaseComprehensive(pData: PurchaseComprehensiveDto): Promise<a
             Authorization: `Bearer ${token}`,
         };
 
-        const data = pData;
+        let data: PurchaseComprehensiveDto = pData;
 
-        const response = await instance.post("/MotorComprehensive/Purchase", data, { headers });
+        // const response = await instance.post("/MotorComprehensive/Purchase", data, { headers });
+
+        let response: AxiosResponse<any>;
+        try {
+            response = await instance.post("/MotorComprehensive/Purchase", data, { headers });
+
+            console.log("Response: ", response)
+
+        } catch (error: any) {
+            console.log("Error Response Status: ", error.response.status)
+            console.log("Error Response Data: ", error.response.data)
+
+            if (error.response?.status === 400 && error.response.data?.Message === 'Agent does not exist') {
+                console.log("Agent does not exist. Retrying with AgentCode = 'Direct'");
+
+                logger.info("Agent does not exist. Retrying with AgentCode = 'Direct'");
+                // Modify the AgentCode and retry
+                data = {
+                    ...pData,
+                    AgentInfo: {
+                        AgentCode: "Direct",
+                    },
+                };
+
+
+                logger.info("Comprehensive Purchase Data: ", data);
+                response = await instance.post("/MotorComprehensive/Purchase", data, { headers }); // Retry the request
+            } else {
+                // It's a different error, re-throw it
+                console.log("Error Purchasing Comprehensive (other than agent error)", error.message);
+                return {
+                    isValid: false,
+                    message: error.message,
+                };
+            }
+        }
+
+
+
         const isValid = response.status === 200;
         const respData = response.data;
 
@@ -510,7 +588,7 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
         const response = await instance.post("/MotorComprehensive/quote", data, { headers });
         const isValid = response.status === 200;
 
-        if (!isValid) 
+        if (!isValid)
             throw new Error("Error getting Quotes");
         const respData = response.data;
 
@@ -523,7 +601,7 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
             .map((key, index) => {
                 let value = classicData[key];
                 value = value.replace(/ *\([^)]*\) */g, ''); // Remove text inside parentheses
-                return `${index+1}. ${key}: ${'N'+value}`;
+                return `${index + 1}. ${key}: ${'N' + value}`;
             });
 
         // console.log("fm: ", formattedArray)
@@ -546,5 +624,54 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
 }
 
 
-export { uploadFiles, getComprehensiveQuote, getAmountByMotorSizes, purchase3rdParty,purchaseComprehensive ,getToken, getAgents, getMotorSizes, fetchToken, validateMotor, generatePolicyCertificate };
+
+
+export async function getAllianzAgents(): Promise<any> {
+
+    try {
+
+        const token = await fetchToken();
+
+        if (token == null) {
+            throw new Error("Error getting Token");
+        }
+
+        const instance: AxiosInstance = axios.create({
+            baseURL: `${AllianzBURL}`,
+        });
+
+        const headers = {
+            Authorization: `Bearer ${token}`,
+        };
+
+        const response = await instance.get("/Motor/agents", { headers });
+        const isValid = response.status === 200;
+
+        if (!isValid)
+            throw new Error("Error getting Quotes");
+        const respData = response.data;
+
+        logger.info("in get Agents: ", respData);
+
+
+
+
+        return {
+            isValid: isValid,
+        };
+    } catch (error) {
+        logger.error("Error getting Agents", error);
+        // throw error;
+        return {
+            isValid: false
+        }
+    }
+
+}
+
+
+
+
+
+export { uploadFiles, getComprehensiveQuote, getAmountByMotorSizes, purchase3rdParty, purchaseComprehensive, getToken, getAgents, getMotorSizes, fetchToken, validateMotor, generatePolicyCertificate };
 

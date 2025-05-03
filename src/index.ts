@@ -12,6 +12,7 @@ import manychatRouter from "./routes/manychat.routes";
 import staticsRouter from "./routes/statics.routes";
 import validatorRouter from "./routes/validator.routes";
 import pavisRouter from "./routes/pavis.routes";
+import { runDBCheck } from "./db";
 
 dotenvConfig();
 
@@ -52,6 +53,13 @@ app.get("/api/uptime", (req, res) => {
     res.status(200).json({
         data: `${process.env.TEST_VAL}`,
         status: serverStatus(),
+    });
+});
+
+app.get("/api/test-db", async (req, res) => {
+    res.status(200).json({
+        data: `${process.env.TEST_VAL}`,
+        status: await runDBCheck(),
     });
 });
 
