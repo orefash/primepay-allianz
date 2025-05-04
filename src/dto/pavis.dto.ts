@@ -1,3 +1,4 @@
+import { AgentInfo, Customer, LicenseInfo } from "./allianz.dto";
 
 
 interface InitApplication {
@@ -5,6 +6,10 @@ interface InitApplication {
     // email: string;
     appln_id?: string;
     isComprehensive: string;
+    customer: Customer;
+    licenseInfo: LicenseInfo;
+    AgentInfo: AgentInfo;
+    stage: number;
 }
 
 interface CompleteApplication extends InitApplication {

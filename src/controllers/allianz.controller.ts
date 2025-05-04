@@ -117,7 +117,7 @@ export async function purchaseThirdParty(req: Request, res: Response) {
 
         if (!pData) {
             console.log("Invalid 3rd purchase dto: ", pData)
-            return res.status(400).json({ success: false, fstatus: 4 });
+            return res.status(400).json({ success: false, fstatus: 4, message: "Invalid 3rd purchase dto" });
         }
 
         logger.info("in ptp");

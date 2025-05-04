@@ -14,15 +14,17 @@ export const saveApplication = async (req: Request, res: Response) => {
         }
 
         const applicationData = req.body as InitApplication;
+        
 
-        let appln_id = await generateUniqueApplicationReference()
+        let appln_id = await generateUniqueApplicationReference();
 
-        let finalData: CompleteApplication = { ...applicationData, appln_id }
+        let finalData: CompleteApplication = { ...applicationData, appln_id };
+
+        finalData.stage = 1;
 
         console.log("Full Data: ", finalData);
 
         let isSaved: boolean = await saveInitApplicationData(finalData);
-
 
         return res.status(200).json({ success: true, data: finalData, message: 'Data saved successfully', fstatus: 1, saved: isSaved });
 
