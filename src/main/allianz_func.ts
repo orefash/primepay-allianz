@@ -459,12 +459,17 @@ async function generatePolicyCertificate(pData: GeneratePolicyCertificateDto): P
         const isValid = response.status === 200;
         const respData = response.data;
 
+        console.log("Response from generate api: ", respData);
+
+        console.log("Response from generate api isValid: ", isValid);
+
         return {
             isValid: isValid,
             data: respData
         };
     } catch (error) {
         logger.error("Error generating policy certificate", error);
+        console.log("Error generating policy certificate", error);
         // throw error;
         return {
             isValid: false

@@ -197,6 +197,7 @@ export async function validateQuote(req: Request, res: Response) {
 
 export async function generatePolicyCertificate(req: Request, res: Response) {
     try {
+        console.log("Generate Policy cet: ", req.body);
         const pData: GeneratePolicyCertificateDto | null = validatePolicyCertificateDto(req.body);
 
         if (!pData) {
@@ -204,7 +205,8 @@ export async function generatePolicyCertificate(req: Request, res: Response) {
         }
 
         const data = await allianzFunc.generatePolicyCertificate(pData);
-        return res.status(200).json({ success: data.success, rstatus: data.success ? 1 : 0, ...data });
+        
+        return res.status(200).json({ success: data.isValid, rstatus: data.isValid ? 1 : 0, ...data });
     } catch (error) {
         logger.error('Error in generate policy certificate:', error);
         return res.status(500).json({ success: false, error: 'Internal server error' });

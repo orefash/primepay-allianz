@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
+import * as path from 'path';
 
 import * as redisConnection from "./helper/redis_helper";
 import { config as dotenvConfig } from "dotenv";
@@ -21,6 +22,9 @@ dotenvConfig();
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({
     origin: "*", // (Whatever your frontend URL is)
