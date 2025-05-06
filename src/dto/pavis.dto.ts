@@ -10,6 +10,10 @@ interface InitApplication {
     licenseInfo: LicenseInfo;
     AgentInfo: AgentInfo;
     stage: number;
+    hasPaid: boolean;
+    transactionRef: string;
+    carPremium: string;
+    carValue?: string;
 }
 
 interface CompleteApplication extends InitApplication {

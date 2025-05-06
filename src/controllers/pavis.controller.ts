@@ -21,6 +21,7 @@ export const saveApplication = async (req: Request, res: Response) => {
         let finalData: CompleteApplication = { ...applicationData, appln_id };
 
         finalData.stage = 1;
+        finalData.hasPaid = false;
 
         console.log("Full Data: ", finalData);
 

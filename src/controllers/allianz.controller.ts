@@ -112,6 +112,7 @@ export async function getMotorPremiumBySize(
 
 export async function purchaseThirdParty(req: Request, res: Response) {
     try {
+        console.log("3rd purchase data: ", req.body)
         const pData: PurchaseDto | null = validatePurchaseDto(req.body);
         const contactId = req.params.contactId;
 
@@ -136,6 +137,7 @@ export async function purchaseThirdParty(req: Request, res: Response) {
 
 export async function purchaseComprehensive(req: Request, res: Response) {
     try {
+        console.log("comprehensive purchase data: ", req.body)
         const pData: PurchaseComprehensiveDto | null = validateComprehensivePurchaseDto(req.body);
         const contactId = req.params.contactId;
 

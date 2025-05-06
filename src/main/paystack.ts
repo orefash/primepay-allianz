@@ -5,11 +5,13 @@ dotenvConfig();
 
 // import * as redisConnection from "./redis_helper";
 import { CreatePaymentLinkRequest, InitiateTransactionResponse } from "../types/paystackTypes";
+import { updateHasPaid } from "../db/application";
+import { ProcessPaylink, processPaylinkRequest } from "../dto/paystack.dto";
 
 
 
 
-export async function createPaymentLink(reqData: CreatePaymentLinkRequest): Promise<any> {
+export async function createPaymentLink(reqData: CreatePaymentLinkRequest, tid: string): Promise<any> {
     try {
         const IS_PAYSTACK_LIVE: string | undefined = process.env.PS_IS_LIVE;
 
@@ -34,9 +36,15 @@ export async function createPaymentLink(reqData: CreatePaymentLinkRequest): Prom
             Authorization: `Bearer ${pkey}`,
         };
 
-        reqData.amount = `${parseFloat(reqData.amount) * 100}`
+        reqData.amount = `${parseFloat(reqData.amount) * 100}`;
 
-        const body = reqData;
+        let handlePaylinkProcess: ProcessPaylink = await processPaylinkRequest(reqData, tid);
+
+        if(!handlePaylinkProcess.success) {
+            throw new Error(handlePaylinkProcess.message);
+        }
+
+        const body = handlePaylinkProcess.data;
 
         console.log("gen pay link data: ", body)
 
@@ -58,8 +66,8 @@ export async function createPaymentLink(reqData: CreatePaymentLinkRequest): Prom
         };
 
 
-    } catch (error) {
-        console.log("Error initiating transaction: ", error)
+    } catch (error: any) {
+        console.log("Error initiating transaction: ", error.message)
         return {
             success: false
         }
@@ -68,7 +76,7 @@ export async function createPaymentLink(reqData: CreatePaymentLinkRequest): Prom
 
 
 
-export async function verifyPayment(reference: string): Promise<any> {
+export async function verifyPayment(reference: string, tranId: string): Promise<any> {
     try {
         const PAYSTACK_TURL: string="https://api.paystack.co/transaction/verify";
 
@@ -104,10 +112,15 @@ export async function verifyPayment(reference: string): Promise<any> {
         if(!respData.status)
             throw new Error("Paystack API Failed Status");
 
-        // console.log(respData)
+        const successFlag: boolean = respData.data.status === "success";
+
+        if(successFlag) { //set appln to isPaid to true
+            let isUpdated: boolean = await updateHasPaid(reference, tranId);
+            console.log(`Application with id: ${tranId} ; Status: ${isUpdated}`);
+        }
 
         return {
-            success: true,
+            success: successFlag,
             payStatus: respData.data.status
         };
 

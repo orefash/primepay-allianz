@@ -79,3 +79,39 @@ export async function saveInitApplicationData(data: CompleteApplication): Promis
 }
 
 
+
+/**
+ * Updates the hasPaid field of an application document in the database.
+ * @param applnId The appln_id of the application to update.
+ * @param hasPaid The boolean value to set for the hasPaid field.
+ * @returns A promise that resolves to true if the update was successful, false otherwise.
+ */
+export async function updateHasPaid(reference: string, applnId: string, hasPaid: boolean = true): Promise<boolean> {
+    let client: MongoClient | null = null;
+    try {
+        client = new MongoClient(mongoURI);
+        await client.connect();
+        const db = client.db();
+        const applicationCollection = db.collection<CompleteApplication>(collectionName);
+
+        const result = await applicationCollection.updateOne(
+            { appln_id: applnId }, // Filter to find the document with the given appln_id
+            { $set: { hasPaid: hasPaid, transRef: reference, stage: 2 } } // Update the hasPaid field
+        );
+
+        if (result.modifiedCount === 1) {
+            console.log(`Successfully updated hasPaid to ${hasPaid} for application: ${applnId}`);
+            return true;
+        } else {
+            console.warn(`Application with appln_id: ${applnId} not found, or hasPaid was already set to ${hasPaid}.`);
+            return false; // Or you might want to throw an error here, depending on your needs
+        }
+    } catch (error) {
+        console.error('Error updating hasPaid:', error);
+        return false;
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}

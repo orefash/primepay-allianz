@@ -4,7 +4,7 @@ import { createPaymentLinkController, verifyPaymentController } from '../control
 
 const paystackRouter = express.Router();
 
-paystackRouter.post('/create-payment-link', createPaymentLinkController);
-paystackRouter.get('/pay-validate/:ref', verifyPaymentController);
+paystackRouter.post('/create-payment-link/:tid', createPaymentLinkController);
+paystackRouter.get('/pay-validate/:ref/:tid', verifyPaymentController);
 
 export default paystackRouter;
