@@ -12,6 +12,7 @@ import { purchaseComprehensiveRun } from "../queue_handler/comprehensivePurchase
 import { GeneratePolicyCertificateDto, MultipleFileUploadDto, ValidateQuoteDto, requestQuoteDto } from '../types/appTypes';
 import { validateFilesUploadDto, validateMotorQuoteBody, validatePolicyCertificateDto, validateQuoteChoice } from '../helper/dtoValidator';
 import { logger } from "../logger/index";
+import { set3rdPartyComplete } from '../db/application';
 // fileUploadController.js
 
 
@@ -115,16 +116,17 @@ export async function purchaseThirdParty(req: Request, res: Response) {
         console.log("3rd purchase data: ", req.body)
         const pData: PurchaseDto | null = validatePurchaseDto(req.body);
         const contactId = req.params.contactId;
+        const tid = req.params.tid;
 
         if (!pData) {
             console.log("Invalid 3rd purchase dto: ", pData)
             return res.status(400).json({ success: false, fstatus: 4, message: "Invalid 3rd purchase dto" });
         }
 
-        logger.info("in ptp");
+        logger.info(`in 3rd party purchase: cid ${contactId}  :  tid  ${tid}`);
         console.log("Valid purchase dto: ", pData)
 
-        let runResult = await purchaseRun(pData, contactId);
+        let runResult = await purchaseRun(pData, contactId, tid);
 
 
         // await triggerTPP(pData, contactId);
@@ -140,8 +142,9 @@ export async function purchaseComprehensive(req: Request, res: Response) {
         console.log("comprehensive purchase data: ", req.body)
         const pData: PurchaseComprehensiveDto | null = validateComprehensivePurchaseDto(req.body);
         const contactId = req.params.contactId;
+        const tid = req.params.tid;
 
-        console.log("pol: ", contactId)
+        logger.info(`in comprehensive purchase: cid ${contactId}  :  tid  ${tid}`);
 
         if (!pData) {
             console.log("Invalid comp purchase dto: ", pData);
@@ -150,7 +153,7 @@ export async function purchaseComprehensive(req: Request, res: Response) {
 
         console.log("Valid comp purchase dto: ", pData);
 
-        let runResult = await purchaseComprehensiveRun(pData, contactId);
+        let runResult = await purchaseComprehensiveRun(pData, contactId, tid);
 
         return res.status(200).json({ success: true, ...runResult });
     } catch (error) {
@@ -198,14 +201,22 @@ export async function validateQuote(req: Request, res: Response) {
 export async function generatePolicyCertificate(req: Request, res: Response) {
     try {
         console.log("Generate Policy cet: ", req.body);
+        console.log("Tid: ", req.params.tid);
         const pData: GeneratePolicyCertificateDto | null = validatePolicyCertificateDto(req.body);
+
+        const tid = req.params.tid;
 
         if (!pData) {
             return res.status(400).json({ success: false, rstatus: 0 });
         }
 
         const data = await allianzFunc.generatePolicyCertificate(pData);
-        
+
+        if(data.isValid) {
+            const status = await set3rdPartyComplete(tid);
+            console.log(`3rd party completion status set: ${status}`);
+        }
+
         return res.status(200).json({ success: data.isValid, rstatus: data.isValid ? 1 : 0, ...data });
     } catch (error) {
         logger.error('Error in generate policy certificate:', error);

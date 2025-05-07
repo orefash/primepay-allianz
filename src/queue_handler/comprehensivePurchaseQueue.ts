@@ -7,16 +7,22 @@ import { PurchaseComprehensiveDto, PurchaseDto } from "../dto/allianz.dto";
 import { sendFlow, setPolicyFields } from "../helper/manychatHelper";
 
 import { logger } from "../logger/index";
+import { updatePolicyPurchase } from "../db/application";
 
 const comprehensivePQueue = new Queue("cpq", opts);
 
-export async function purchaseComprehensiveRun(params: PurchaseComprehensiveDto, contactId: string) {
+export async function purchaseComprehensiveRun(params: PurchaseComprehensiveDto, contactId: string, tid: string) {
 
     let pData = await purchaseComprehensive(params);
 
     logger.info("Res: ", pData);
 
     if (pData.isValid) {
+
+        let purchaseStatusUpdated: boolean = await updatePolicyPurchase(tid);
+
+        console.log("Purchase status updated : ", purchaseStatusUpdated);
+
         let responseData = await setPolicyFields(contactId, pData.data.referenceId);
 
         logger.info("cpp policy: ", responseData);
@@ -24,8 +30,8 @@ export async function purchaseComprehensiveRun(params: PurchaseComprehensiveDto,
         if (responseData) {
             let sendFlowResp = await sendFlow(contactId, "policy_confirm");
             logger.info("cpq send flow: ", sendFlowResp);
-            
-            if(sendFlowResp) {
+
+            if (sendFlowResp) {
                 return {
                     fstatus: 0,
                     message: "insurance purchased successfully"
@@ -36,14 +42,14 @@ export async function purchaseComprehensiveRun(params: PurchaseComprehensiveDto,
                 fstatus: 3,
                 message: "error sending to policy confirm"
             }
-            
+
         } else {
             return {
                 fstatus: 2,
                 message: "error setting policy fields"
             }
         }
-    }else{
+    } else {
         logger.error("purchase comprehensive api error");
 
         return {
@@ -73,7 +79,7 @@ comprehensivePQueue.process(async (job) => {
             let sendFlowResp = await sendFlow(job.data.contactId, "policy_confirm");
             console.log("cpq send flow: ", sendFlowResp);
         }
-    }else {
+    } else {
 
         logger.error("pdata is invalid");
     }

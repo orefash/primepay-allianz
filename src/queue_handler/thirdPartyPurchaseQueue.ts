@@ -6,6 +6,7 @@ import { purchase3rdParty } from "../main/allianz_func";
 import { PurchaseDto } from "../dto/allianz.dto";
 import { setPolicyFields, sendFlow } from "../helper/manychatHelper";
 import { logger } from "../logger/index";
+import { updatePolicyPurchase } from "../db/application";
 
 const tppQueue = new Queue("tpp", opts);
 
@@ -15,12 +16,17 @@ export async function
 
 
 
-purchaseRun (params: PurchaseDto, contactId: string){
+purchaseRun (params: PurchaseDto, contactId: string, tid: string){
 
     let pData = await purchase3rdParty(params);
 
     console.log("Res: ", pData);
     if (pData.isValid) {
+
+        let purchaseStatusUpdated: boolean = await updatePolicyPurchase(tid);
+
+        console.log("Purchase status updated : ", purchaseStatusUpdated);
+
         let responseData = await setPolicyFields(contactId, pData.data.referenceId, pData.data.certificateNumber);
 
         console.log("tpp policy: ", responseData);

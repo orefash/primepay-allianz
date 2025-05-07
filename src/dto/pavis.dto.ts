@@ -14,6 +14,10 @@ interface InitApplication {
     transactionRef: string;
     carPremium: string;
     carValue?: string;
+    purchaseInsurance: boolean;
+    hasCertificate: boolean;
+    completed: boolean;
+    certificateUrl?: string;
 }
 
 interface CompleteApplication extends InitApplication {

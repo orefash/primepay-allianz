@@ -96,7 +96,7 @@ export async function updateHasPaid(reference: string, applnId: string, hasPaid:
 
         const result = await applicationCollection.updateOne(
             { appln_id: applnId }, // Filter to find the document with the given appln_id
-            { $set: { hasPaid: hasPaid, transRef: reference, stage: 2 } } // Update the hasPaid field
+            { $set: { hasPaid: hasPaid, transRef: reference, stage: 2 }} // Update the hasPaid field
         );
 
         if (result.modifiedCount === 1) {
@@ -108,6 +108,67 @@ export async function updateHasPaid(reference: string, applnId: string, hasPaid:
         }
     } catch (error) {
         console.error('Error updating hasPaid:', error);
+        return false;
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}
+
+export async function updatePolicyPurchase(applnId: string, purchaseInsurance: boolean = true): Promise<boolean> {
+    let client: MongoClient | null = null;
+    try {
+        client = new MongoClient(mongoURI);
+        await client.connect();
+        const db = client.db();
+        const applicationCollection = db.collection<CompleteApplication>(collectionName);
+
+        const result = await applicationCollection.updateOne(
+            { appln_id: applnId }, // Filter to find the document with the given appln_id
+            { $set: { purchaseInsurance: purchaseInsurance, stage: 3 }} // Update the hasPaid field
+        );
+
+        if (result.modifiedCount === 1) {
+            console.log(`Successfully updated purchaseInsurance to ${purchaseInsurance} for application: ${applnId}`);
+            return true;
+        } else {
+            console.warn(`Application with appln_id: ${applnId} not found, or purchaseInsurance was already set to ${purchaseInsurance}.`);
+            return false; // Or you might want to throw an error here, depending on your needs
+        }
+    } catch (error) {
+        console.error('Error updating purchaseInsurance:', error);
+        return false;
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}
+
+
+export async function set3rdPartyComplete(applnId: string): Promise<boolean> {
+    let client: MongoClient | null = null;
+    try {
+        client = new MongoClient(mongoURI);
+        await client.connect();
+        const db = client.db();
+        const applicationCollection = db.collection<CompleteApplication>(collectionName);
+
+        const result = await applicationCollection.updateOne(
+            { appln_id: applnId }, // Filter to find the document with the given appln_id
+            { $set: { hasCertificate: true, completed: true }} // Update the hasPaid field
+        );
+
+        if (result.modifiedCount === 1) {
+            console.log(`Successfully updated 3rd party to completed for application: ${applnId}`);
+            return true;
+        } else {
+            console.warn(`Application with appln_id: ${applnId} not found, or status already updated`);
+            return false; // Or you might want to throw an error here, depending on your needs
+        }
+    } catch (error) {
+        console.error('Error updating purchaseInsurance:', error);
         return false;
     } finally {
         if (client) {
