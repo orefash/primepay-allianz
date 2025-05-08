@@ -18,6 +18,8 @@ interface InitApplication {
     hasCertificate: boolean;
     completed: boolean;
     certificateUrl?: string;
+    allianzRefId?: string;
+    allianzCertNo?: string;
 }
 
 interface CompleteApplication extends InitApplication {

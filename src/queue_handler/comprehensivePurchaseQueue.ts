@@ -19,7 +19,7 @@ export async function purchaseComprehensiveRun(params: PurchaseComprehensiveDto,
 
     if (pData.isValid) {
 
-        let purchaseStatusUpdated: boolean = await updatePolicyPurchase(tid);
+        let purchaseStatusUpdated: boolean = await updatePolicyPurchase(tid, true, pData.data.referenceId);
 
         console.log("Purchase status updated : ", purchaseStatusUpdated);
 

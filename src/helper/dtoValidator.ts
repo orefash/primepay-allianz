@@ -31,6 +31,7 @@ export function validateQuoteChoice(body: any): ValidateQuoteDto | null {
 
         return validateDto;
     }
+    console.log("Error in validate Quote Dto");
     return null;
 }
 

@@ -167,6 +167,7 @@ export async function getComprehensiveQuote(req: Request, res: Response) {
         const pData: requestQuoteDto | null = validateMotorQuoteBody(req.body);
 
         if (!pData) {
+            console.log("Error in Get COmprehensive quote - invalid data")
             return res.status(400).json({ success: false });
         }
 
@@ -213,7 +214,7 @@ export async function generatePolicyCertificate(req: Request, res: Response) {
         const data = await allianzFunc.generatePolicyCertificate(pData);
 
         if(data.isValid) {
-            const status = await set3rdPartyComplete(tid);
+            const status = await set3rdPartyComplete(tid, data.path);
             console.log(`3rd party completion status set: ${status}`);
         }
 

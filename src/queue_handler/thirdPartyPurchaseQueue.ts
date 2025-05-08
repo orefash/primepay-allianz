@@ -23,7 +23,7 @@ purchaseRun (params: PurchaseDto, contactId: string, tid: string){
     console.log("Res: ", pData);
     if (pData.isValid) {
 
-        let purchaseStatusUpdated: boolean = await updatePolicyPurchase(tid);
+        let purchaseStatusUpdated: boolean = await updatePolicyPurchase(tid, true, pData.data.referenceId, pData.data.certificateNumber);
 
         console.log("Purchase status updated : ", purchaseStatusUpdated);
 

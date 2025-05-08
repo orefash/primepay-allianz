@@ -26,6 +26,7 @@ export const saveApplication = async (req: Request, res: Response) => {
         finalData.purchaseInsurance = false;
         finalData.hasCertificate = false;
         finalData.completed = false;
+        
 
         console.log("Full Data: ", finalData);
 

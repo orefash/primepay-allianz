@@ -116,7 +116,7 @@ export async function updateHasPaid(reference: string, applnId: string, hasPaid:
     }
 }
 
-export async function updatePolicyPurchase(applnId: string, purchaseInsurance: boolean = true): Promise<boolean> {
+export async function updatePolicyPurchase(applnId: string, purchaseInsurance: boolean = true, allianzRefId: string, allianzCertNo: string = ""): Promise<boolean> {
     let client: MongoClient | null = null;
     try {
         client = new MongoClient(mongoURI);
@@ -126,7 +126,7 @@ export async function updatePolicyPurchase(applnId: string, purchaseInsurance: b
 
         const result = await applicationCollection.updateOne(
             { appln_id: applnId }, // Filter to find the document with the given appln_id
-            { $set: { purchaseInsurance: purchaseInsurance, stage: 3 }} // Update the hasPaid field
+            { $set: { purchaseInsurance: purchaseInsurance, stage: 3, allianzCertNo, allianzRefId }} // Update the hasPaid field
         );
 
         if (result.modifiedCount === 1) {
@@ -147,7 +147,7 @@ export async function updatePolicyPurchase(applnId: string, purchaseInsurance: b
 }
 
 
-export async function set3rdPartyComplete(applnId: string): Promise<boolean> {
+export async function set3rdPartyComplete(applnId: string, certificateUrl: string): Promise<boolean> {
     let client: MongoClient | null = null;
     try {
         client = new MongoClient(mongoURI);
@@ -157,7 +157,7 @@ export async function set3rdPartyComplete(applnId: string): Promise<boolean> {
 
         const result = await applicationCollection.updateOne(
             { appln_id: applnId }, // Filter to find the document with the given appln_id
-            { $set: { hasCertificate: true, completed: true }} // Update the hasPaid field
+            { $set: { hasCertificate: true, completed: true, certificateUrl }} // Update the hasPaid field
         );
 
         if (result.modifiedCount === 1) {

@@ -214,7 +214,7 @@ async function getMotorSizes(): Promise<any> {
         }).join('\n');
 
         return {
-            success: true,
+            success: 1,
             sizes: newData,
             length: motorData.length,
         };
@@ -609,8 +609,11 @@ async function getComprehensiveQuote(pData: requestQuoteDto | null): Promise<any
                 return `${index + 1}. ${key}: ${'N' + value}`;
             });
 
-        // console.log("fm: ", formattedArray)
-        // console.log("fm ln: ", formattedArray.length)
+
+        console.log("In get quote: ")
+
+        console.log("fm: ", formattedArray)
+        console.log("fm ln: ", formattedArray.length)
 
         return {
             isValid: isValid,
