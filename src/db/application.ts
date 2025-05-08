@@ -66,7 +66,7 @@ export async function saveInitApplicationData(data: CompleteApplication): Promis
         const application: Collection<CompleteApplication> = db.collection(collectionName);
 
         const result = await application.insertOne(data);
-        console.log("Result: ", result)
+        console.log("Save Application Result: ", result);
         return result.acknowledged;
     } catch (error) {
         console.error('Error saving data:', error);

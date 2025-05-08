@@ -4,6 +4,7 @@ import * as cors from "cors";
 import * as path from 'path';
 
 import * as redisConnection from "./helper/redis_helper";
+// import { testExtract } from "./helper/data/carExtract";
 import { config as dotenvConfig } from "dotenv";
 import * as queueHelper from "./queue_handler/queue";
 import emailRouter from "./routes/mailer.routes";
@@ -17,6 +18,7 @@ import { runDBCheck } from "./db";
 
 dotenvConfig();
 
+// testExtract();
 
 
 const app = express();

@@ -41,7 +41,7 @@ export async function sendFlow(contactId: string, flowType: string): Promise<boo
 
         const response = await instance.post("", body, { headers });
 
-        console.log("in send flow: ", response.data)
+        console.log(`in send flow: ${flow}`, response.data)
 
         if(response.status === 200){
             return true

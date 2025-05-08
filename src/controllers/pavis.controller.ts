@@ -10,6 +10,7 @@ export const saveApplication = async (req: Request, res: Response) => {
 
         console.log("Appln Data pre-validation: ", req.body);
         if (!isValidInitApplication(req.body)) {
+            console.log("Appln data validation failed");
             return res.status(400).json({ success: false, message: 'Invalid request body format for InitApplication.', fstatus: 0 });
         }
 
