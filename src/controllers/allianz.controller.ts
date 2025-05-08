@@ -186,6 +186,7 @@ export async function validateQuote(req: Request, res: Response) {
         const pData: ValidateQuoteDto | null = validateQuoteChoice(req.body);
 
         if (!pData) {
+            console.log("In validate quote: DTO invalid")
             return res.status(400).json({ success: false, rstatus: 0 });
         }
 

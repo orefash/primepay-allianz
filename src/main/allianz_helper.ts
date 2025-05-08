@@ -7,15 +7,22 @@ export async function validateQuoteChoice(data: ValidateQuoteDto | null): Promis
         if(!data)
             throw new Error("Invalid Data")
 
+        console.log("Quote data: ", data);
+
         let quoteData = data.tempString;
 
         let qArray: [string, string][] = Object.entries(quoteData);
-        // console.log(qArray)
+        // console.log("qarray: ",qArray)
 
         let installmentType: string = qArray[data.qouteChoice - 1][0];
         let premiumAmount: string = qArray[data.qouteChoice - 1][1];
 
-        premiumAmount = premiumAmount.split(' ')[0].replace(',','');
+        // console.log(`installment: ${installmentType}  : amount: ${premiumAmount}`)
+
+        premiumAmount = premiumAmount.split(' ')[0].replace(/,/g, '');
+
+
+        console.log(`AFTER:  installment: ${installmentType}  : amount: ${premiumAmount}`)
 
         return {
             success: true,
@@ -24,7 +31,7 @@ export async function validateQuoteChoice(data: ValidateQuoteDto | null): Promis
         }
         
     } catch (error) {
-        console.log("Erro in vlaidate quote: ", error)
+        console.log("Erro in validate quote: ", error)
         return {
             success: false
         }
